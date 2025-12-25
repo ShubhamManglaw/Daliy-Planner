@@ -18,7 +18,8 @@ const Login = ({ onLoginSuccess }) => {
             if (onLoginSuccess) onLoginSuccess();
         } catch (err) {
             console.error("Login failed", err);
-            setError('Failed to sign in. Check your formatting or connection.');
+            console.error("Login failed", err);
+            setError(`Failed to sign in: ${err.message || 'Check your formatting or connection.'}`);
         } finally {
             setLoading(false);
         }
