@@ -1,0 +1,30 @@
+.view-selector {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: transparent;
+}
+
+.view-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.view-tab:hover {
+    background-color: rgba(91, 95, 239, 0.05);
+    /* slightly tinted primary */
+}
+
+.view-tab.active {
+    background-color: var(--accent-primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(91, 95, 239, 0.2);
+}

@@ -1,0 +1,69 @@
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 4px;
+    background: white;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s;
+}
+
+.task-item:hover {
+    background-color: #f9fafb;
+}
+
+.task-checkbox {
+    cursor: pointer;
+}
+
+.task-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    padding: 2px 4px;
+    outline: none;
+    width: 100%;
+}
+
+.task-input:focus {
+    background-color: #f3f4f6;
+    border-radius: 2px;
+}
+
+.task-item.completed .task-input {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.task-priority {
+    font-size: 0.7rem;
+    border: none;
+    border-radius: 12px;
+    padding: 2px 8px;
+    cursor: pointer;
+    appearance: none;
+    /* simple styling */
+    text-align: center;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.delete-btn {
+    opacity: 0;
+    color: var(--danger-color);
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-item:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:hover {
+    background-color: #fee2e2;
+}

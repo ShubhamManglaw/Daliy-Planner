@@ -1,0 +1,341 @@
+.daily-view {
+    padding: var(--spacing-lg);
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.view-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.date-display {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.date-display h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.today-badge {
+    color: var(--accent-primary);
+    background: var(--accent-secondary);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.nav-btn {
+    padding: var(--spacing-xs);
+    border-radius: 50%;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Stats Row */
+.daily-stats-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.progress-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-secondary);
+}
+
+/* Goals Section */
+.goals-section {
+    background: var(--success-bg);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+}
+
+.goals-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    color: #15803d;
+}
+
+.goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    color: #166534;
+    font-weight: 500;
+}
+
+.icon-checked {
+    color: #15803d;
+}
+
+.icon-unchecked {
+    color: #86efac;
+}
+
+.completed-text {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.delete-btn {
+    margin-left: auto;
+    opacity: 0;
+    color: #ef4444;
+    transition: opacity 0.2s;
+}
+
+.goal-item:hover .delete-btn {
+    opacity: 1;
+}
+
+.new-goal-input input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid rgba(21, 128, 61, 0.2);
+    border-radius: var(--radius-sm);
+    background: white;
+    outline: none;
+}
+
+/* Tasks & Content Grid */
+.daily-content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-xl);
+    flex: 1;
+}
+
+.tasks-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.primary-btn-small {
+    background: var(--accent-primary);
+    color: white;
+    padding: 6px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.1s;
+}
+
+.primary-btn-small:active {
+    transform: scale(0.98);
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.task-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 80px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+.task-content-card {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.task-content-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-main {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.task-tag {
+    background: var(--bg-primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.delete-btn-task {
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.task-item:hover .delete-btn-task {
+    opacity: 1;
+}
+
+.delete-btn-task:hover {
+    color: var(--danger-text);
+}
+
+/* Task Input Card */
+.task-input-card {
+    background: white;
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 4px 6px rgba(91, 95, 239, 0.1);
+}
+
+.task-title-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    outline: none;
+}
+
+.task-meta-inputs {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.task-meta-inputs input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    outline: none;
+}
+
+.task-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+}
+
+.cancel-btn {
+    padding: 6px 16px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.confirm-btn {
+    padding: 6px 16px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+/* Notes */
+.notes-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.notes-editor {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: white;
+    padding: var(--spacing-md);
+}
+
+.notes-editor textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.empty-state {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-style: italic;
+    padding: 4px 0;
+}
+
+.icon-btn-secondary {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.task-item:hover .icon-btn-secondary {
+    opacity: 1;
+}

@@ -1,0 +1,16 @@
+{
+  "data": {
+    "2025-12-22": {
+      "tasks": [],
+      "goals": [],
+      "notes": "This i the best day\n"
+    }
+  },
+  "yearlyData": {},
+  "categories": [
+    {
+      "name": "Java Script",
+      "color": "#ff0000"
+    }
+  ]
+}

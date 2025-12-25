@@ -1,0 +1,102 @@
+.weekly-view {
+    padding: var(--spacing-lg);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-sm);
+    flex: 1;
+    overflow: hidden;
+    min-height: 400px;
+    /* Ensure a minimum height for the grid */
+}
+
+.day-column {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent overflow of content */
+}
+
+.day-column-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    background: #FAFAFA;
+}
+
+.day-column-header.is-today {
+    background: var(--accent-secondary);
+    color: var(--accent-primary);
+}
+
+.day-name {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.day-column-header.is-today .day-name {
+    color: var(--accent-primary);
+}
+
+.day-date {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.day-column-content {
+    flex: 1;
+    padding: 8px;
+    overflow-y: auto;
+    background: #FAFAFA;
+}
+
+.day-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.mini-task {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 2px solid var(--accent-primary);
+}
+
+.mini-task.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+    border-left-color: var(--success-text);
+}
+
+.empty-slot-marker {
+    height: 100%;
+    opacity: 0.1;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, #ccc 20px);
+}
