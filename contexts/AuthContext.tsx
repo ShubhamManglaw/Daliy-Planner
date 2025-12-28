@@ -45,8 +45,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Error signing in with Google", error);
+    } catch (error: any) {
+      console.error("Error signing in with Google:", error);
+      if (error.code === 'auth/unauthorized-domain') {
+        console.error("This domain is not authorized for OAuth operations for your Firebase project. Edit the list of authorized domains from the Firebase Console.");
+      } else if (error.code === 'auth/api-key-not-valid-please-pass-a-valid-api-key') {
+        console.error("Firebase API Key is invalid. Check your .env file or Vercel Environment Variables.");
+      }
+      alert(`Login Failed: ${error.message}`);
     }
   };
 

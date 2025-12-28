@@ -11,6 +11,13 @@ const firebaseConfig = {
   measurementId: "G-JW29E122N1"
 };
 
+// Check if all required keys are present
+Object.entries(firebaseConfig).forEach(([key, value]) => {
+  if (!value) {
+    console.error(`Missing Firebase config key: ${key}. Check your environment variables.`);
+  }
+});
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
