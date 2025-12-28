@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Task } from '../types';
 import { useAuth } from './AuthContext';
 import { db } from '../lib/firebase';
@@ -25,6 +25,8 @@ interface PlannerContextType {
   updateDailyGoalCurrent: (current: number) => void;
 
   getStudyData: (timeframe: string) => { name: string; hours: number }[];
+
+  syncStatus: 'synced' | 'syncing' | 'error';
 }
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -44,27 +46,42 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
   const [dailyGoal, setDailyGoal] = useState<DailyGoal>({ current: 0, target: 4 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced');
+
+  // Use a ref to track if the current state update comes from Firestore
+  // This prevents writing the data back to Firestore immediately after fetching it
+  const isUpdateFromDb = useRef(false);
 
   // Load data from Firestore
   useEffect(() => {
     if (user && user.id) {
+      setSyncStatus('syncing');
       const userDocRef = doc(db, 'users', user.id);
 
       // Real-time listener
       const unsubscribe = onSnapshot(userDocRef, async (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
+          console.log("Data fetched from Firestore:", data);
+
+          // Mark this update as coming from DB
+          isUpdateFromDb.current = true;
+
           setTasks(Array.isArray(data.tasks) ? data.tasks : []);
           setCategories(Array.isArray(data.categories) ? data.categories : DEFAULT_CATEGORIES);
           setDailyGoal(data.dailyGoal || { current: 0, target: 4 });
+
           setIsLoaded(true);
+          setSyncStatus('synced');
         } else {
+          console.log("No Firestore document found. Checking local storage...");
           // If doc doesn't exist, check for local storage data to migrate
           const storageKey = `scholarSync_data_${user.id}`;
           const localData = localStorage.getItem(storageKey);
 
           if (localData) {
             try {
+              console.log("Migrating local data to Firestore...");
               const parsed = JSON.parse(localData);
               // Migrate to Firestore
               await setDoc(userDocRef, {
@@ -72,26 +89,35 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
                 categories: Array.isArray(parsed.categories) ? parsed.categories : DEFAULT_CATEGORIES,
                 dailyGoal: parsed.dailyGoal || { current: 0, target: 4 }
               });
+              console.log("Migration successful.");
               // Don't set state here, the listener will fire again with the new data
             } catch (e) {
               console.error("Migration failed", e);
+              alert("Failed to migrate your local data to the cloud. Check your connection.");
               // Fallback defaults
               setTasks([]);
               setCategories(DEFAULT_CATEGORIES);
               setDailyGoal({ current: 0, target: 4 });
               setIsLoaded(true);
+              setSyncStatus('error');
             }
           } else {
+            console.log("No local data found. Starting fresh.");
             // No local data, initialize empty defaults
             setTasks([]);
             setCategories(DEFAULT_CATEGORIES);
             setDailyGoal({ current: 0, target: 4 });
             setIsLoaded(true);
+            setSyncStatus('synced');
           }
         }
       }, (error) => {
-        console.error("Firestore Error:", error);
-        setIsLoaded(true); // Ensure app doesn't hang
+        console.error("Firestore Read Error:", error);
+        if (error.code === 'permission-denied') {
+          alert("Access Denied: You don't have permission to read your data. Check Firestore Rules in Firebase Console.");
+        }
+        setIsLoaded(true);
+        setSyncStatus('error');
       });
 
       return () => unsubscribe();
@@ -104,14 +130,27 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Save data to Firestore (Debounced)
   useEffect(() => {
     if (user && user.id && isLoaded) {
+      // If this change was triggered by a DB update, don't write it back
+      if (isUpdateFromDb.current) {
+        isUpdateFromDb.current = false;
+        return;
+      }
+
+      setSyncStatus('syncing');
       const userDocRef = doc(db, 'users', user.id);
       const dataToSave = { tasks, categories, dailyGoal };
 
       const timeoutId = setTimeout(async () => {
         try {
           await setDoc(userDocRef, dataToSave, { merge: true });
-        } catch (error) {
+          console.log("Data saved to Firestore successfully.");
+          setSyncStatus('synced');
+        } catch (error: any) {
           console.error("Failed to save to Firestore:", error);
+          if (error.code === 'permission-denied') {
+            alert("Save Failed: Permission Denied. Check Firestore Rules.");
+          }
+          setSyncStatus('error');
         }
       }, 1000); // 1 second debounce
 
@@ -245,8 +284,9 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     tasks, addTask, updateTask, deleteTask, clearAllData,
     categories, addCategory, removeCategory,
     dailyGoal, updateDailyGoalTarget, updateDailyGoalCurrent,
-    getStudyData
-  }), [tasks, categories, dailyGoal, addTask, updateTask, deleteTask, clearAllData, addCategory, removeCategory, updateDailyGoalTarget, updateDailyGoalCurrent, getStudyData]);
+    getStudyData,
+    syncStatus
+  }), [tasks, categories, dailyGoal, addTask, updateTask, deleteTask, clearAllData, addCategory, removeCategory, updateDailyGoalTarget, updateDailyGoalCurrent, getStudyData, syncStatus]);
 
   return (
     <PlannerContext.Provider value={contextValue}>

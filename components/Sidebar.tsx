@@ -1,15 +1,19 @@
 import React from 'react';
 import { NavView } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  LayoutDashboard, 
-  CalendarDays, 
-  CalendarRange, 
-  CheckSquare, 
-  Settings, 
+import { usePlanner } from '../contexts/PlannerContext';
+import {
+  LayoutDashboard,
+  CalendarDays,
+  CalendarRange,
+  CheckSquare,
+  Settings,
   Plus,
   LogOut,
-  X
+  X,
+  RefreshCcw,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,6 +26,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onAddNew, isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const { syncStatus } = usePlanner();
 
   const navItems = [
     { icon: LayoutDashboard, label: NavView.DASHBOARD },
@@ -36,67 +41,85 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onA
     onClose(); // Close sidebar on mobile when item clicked
   };
 
+  const getSyncIcon = () => {
+    switch (syncStatus) {
+      case 'synced': return <CheckCircle2 size={14} className="text-green-500" />;
+      case 'syncing': return <RefreshCcw size={14} className="text-blue-500 animate-spin" />;
+      case 'error': return <AlertCircle size={14} className="text-red-500" />;
+    }
+  };
+
+  const getSyncText = () => {
+    switch (syncStatus) {
+      case 'synced': return 'Saved to Cloud';
+      case 'syncing': return 'Syncing...';
+      case 'error': return 'Sync Error';
+    }
+  };
+
   const SidebarContent = () => (
     <>
-        {/* Mobile Header with Close Button */}
-        <div className="md:hidden flex justify-end p-4">
-            <button onClick={onClose} className="text-slate-500 hover:text-slate-800">
-                <X size={24} />
-            </button>
-        </div>
+      {/* Mobile Header with Close Button */}
+      <div className="md:hidden flex justify-end p-4">
+        <button onClick={onClose} className="text-slate-500 hover:text-slate-800">
+          <X size={24} />
+        </button>
+      </div>
 
-        {/* User Profile */}
-        <div className="p-6 flex items-center gap-3 mb-2">
-            <div className="relative">
-                <img 
-                    src={user?.avatar || "https://ui-avatars.com/api/?name=User&background=random"} 
-                    alt="User" 
-                    className="w-12 h-12 rounded-full object-cover border-2 border-slate-100"
-                />
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
-            <div className="overflow-hidden">
-                <h3 className="font-bold text-slate-800 text-sm truncate">{user?.name || 'Student'}</h3>
-                <p className="text-xs text-slate-500 truncate">{user?.email || 'Student Account'}</p>
-            </div>
+      {/* User Profile */}
+      <div className="p-6 flex items-center gap-3 mb-2">
+        <div className="relative">
+          <img
+            src={user?.avatar || "https://ui-avatars.com/api/?name=User&background=random"}
+            alt="User"
+            className="w-12 h-12 rounded-full object-cover border-2 border-slate-100"
+          />
+          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${syncStatus === 'error' ? 'bg-red-500' : 'bg-green-500'}`}></div>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-            {navItems.map((item) => (
-            <button
-                key={item.label}
-                onClick={() => handleNavClick(item.label)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                currentView === item.label
-                    ? 'bg-blue-50 text-blue-600 shadow-sm'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-                }`}
-            >
-                <item.icon size={20} />
-                {item.label}
-            </button>
-            ))}
-        </nav>
-
-        {/* Bottom Actions */}
-        <div className="p-4 border-t border-slate-100 mt-auto">
-            <button 
-                onClick={() => { onAddNew(); onClose(); }}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors shadow-lg shadow-blue-200 active:scale-95 transform"
-            >
-                <Plus size={20} />
-                <span>New Task</span>
-            </button>
-            
-            <button 
-                onClick={logout}
-                className="w-full mt-4 flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors justify-center"
-            >
-                <LogOut size={18} />
-                <span>Log Out</span>
-            </button>
+        <div className="overflow-hidden">
+          <h3 className="font-bold text-slate-800 text-sm truncate">{user?.name || 'Student'}</h3>
+          <div className="flex items-center gap-1 mt-0.5">
+            {getSyncIcon()}
+            <span className="text-xs text-slate-500 truncate">{getSyncText()}</span>
+          </div>
         </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+        {navItems.map((item) => (
+          <button
+            key={item.label}
+            onClick={() => handleNavClick(item.label)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${currentView === item.label
+                ? 'bg-blue-50 text-blue-600 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              }`}
+          >
+            <item.icon size={20} />
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* Bottom Actions */}
+      <div className="p-4 border-t border-slate-100 mt-auto">
+        <button
+          onClick={() => { onAddNew(); onClose(); }}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors shadow-lg shadow-blue-200 active:scale-95 transform"
+        >
+          <Plus size={20} />
+          <span>New Task</span>
+        </button>
+
+        <button
+          onClick={logout}
+          className="w-full mt-4 flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors justify-center"
+        >
+          <LogOut size={18} />
+          <span>Log Out</span>
+        </button>
+      </div>
     </>
   );
 
@@ -109,9 +132,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, onA
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-            className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity" 
-            onClick={onClose}
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity"
+          onClick={onClose}
         ></div>
       )}
 
