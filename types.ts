@@ -17,7 +17,7 @@ export interface Task {
   status: Status;
   priority: Priority;
   duration?: number; // Estimated duration in minutes
-  completedAt?: string; // ISO string when status moved to Done
+  completedAt?: string | null; // ISO string when status moved to Done
   tags?: string[];
   progress?: number;
   description?: string;

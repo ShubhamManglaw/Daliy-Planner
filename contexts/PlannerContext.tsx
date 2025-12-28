@@ -127,6 +127,23 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   }, [user]);
 
+  // Helper to sanitize data for Firestore (remove undefined, convert to null)
+  const sanitizeData = (data: any): any => {
+    if (data === undefined) return null;
+    if (data === null) return null;
+    if (Array.isArray(data)) return data.map(sanitizeData);
+    if (typeof data === 'object') {
+      const sanitized: any = {};
+      for (const key in data) {
+        if (data[key] !== undefined) {
+          sanitized[key] = sanitizeData(data[key]);
+        }
+      }
+      return sanitized;
+    }
+    return data;
+  };
+
   // Save data to Firestore (Debounced)
   useEffect(() => {
     if (user && user.id && isLoaded) {
@@ -138,7 +155,9 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
 
       setSyncStatus('syncing');
       const userDocRef = doc(db, 'users', user.id);
-      const dataToSave = { tasks, categories, dailyGoal };
+
+      // Sanitize specifically for Firestore
+      const dataToSave = sanitizeData({ tasks, categories, dailyGoal });
 
       const timeoutId = setTimeout(async () => {
         try {
@@ -149,6 +168,9 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
           console.error("Failed to save to Firestore:", error);
           if (error.code === 'permission-denied') {
             alert("Save Failed: Permission Denied. Check Firestore Rules.");
+          } else {
+            console.error("Detailed Firestore Error:", error);
+            // alert(`Save Error: ${error.message}`); 
           }
           setSyncStatus('error');
         }
@@ -162,7 +184,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
     const newTask: Task = {
       ...taskData,
       id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 9),
-      completedAt: taskData.status === 'Done' ? new Date().toISOString() : undefined,
+      completedAt: taskData.status === 'Done' ? new Date().toISOString() : null,
       duration: taskData.duration || 60,
     };
     setTasks(prev => [...prev, newTask]);
@@ -176,7 +198,7 @@ export const PlannerProvider: React.FC<{ children: ReactNode }> = ({ children })
         if (updatedTask.status === 'Done' && (t.status !== 'Done' || !t.completedAt)) {
           completedAt = new Date().toISOString();
         } else if (updatedTask.status !== 'Done' && t.status === 'Done') {
-          completedAt = undefined;
+          completedAt = null;
         }
         return {
           ...updatedTask,
